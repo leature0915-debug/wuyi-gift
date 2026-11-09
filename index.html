@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>临床营养学复习资料库</title>
+    <style>
+        body { font-family: 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg,#eef3ff,#f7fbf7); margin:0; padding:20px; }
+        #gate { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#1677ff,#4caf50); z-index:10000; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+        #gate .logo { font-size:70px; }
+        #gate h2 { color:white; margin:10px 0 30px; }
+        #gate button { padding:15px 50px; font-size:19px; border:none; border-radius:30px; background:white; color:#1677ff; font-weight:bold; cursor:pointer; }
+        #gate p { color:rgba(255,255,255,0.85); font-size:13px; margin-top:20px; }
+        .header { text-align:center; margin: 20px 0 10px; }
+        .header h1 { color:#2c3e50; font-size: 26px; }
+        .header p { color:#888; font-size: 14px; }
+        .progress { text-align:center; color:#1677ff; font-size:15px; font-weight:bold; margin-bottom:20px; }
+        .grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; max-width:600px; margin:0 auto; }
+        .icon-card { width:130px; height:150px; background:white; border-radius:14px; box-shadow:0 3px 12px rgba(0,0,0,0.12);
+                     display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:0.2s; position:relative; }
+        .icon-card .pdf-icon { font-size:44px; }
+        .icon-card .name { margin-top:8px; font-size:13px; color:#333; text-align:center; padding:0 6px; }
+        .icon-card .badge { position:absolute; top:8px; right:10px; font-size:22px; }
+        .icon-card.done { background:#e8f7ee; border:2px solid #4caf50; }
+        .video-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9998;
+                      display:none; flex-direction:column; justify-content:center; align-items:center; }
+        .video-mask video { width:100%; max-height:80%; background:#000; }
+        .video-tip { color:white; margin-top:15px; font-size:16px; text-align:center; }
+        .notes-section { max-width:600px; margin:30px auto; }
+        .notes-btn { width:100%; padding:15px; border:none; border-radius:12px; font-size:17px; cursor:pointer;
+                     background:#4caf50; color:white; font-weight:bold; }
+        .notes-btn:disabled { background:#cccccc; cursor:not-allowed; }
+        .notes-content { display:none; background:white; border-radius:14px; padding:20px; margin-top:15px;
+                         box-shadow:0 3px 12px rgba(0,0,0,0.12); }
+        .note-block { margin-bottom:25px; padding-bottom:20px; border-bottom:1px solid #eee; }
+        .note-block h3 { color:#2c3e50; margin:0 0 10px; }
+        .note-block pre { white-space:pre-wrap; font-size:14px; line-height:1.7; color:#333; font-family:inherit; margin:0 0 12px; }
+        .note-block button { padding:8px 18px; border:none; border-radius:8px; background:#1677ff; color:white; font-size:14px; cursor:pointer; }
+        .editor-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;
+                       display:none; justify-content:center; align-items:center; }
+        .editor-box { background:white; width:92%; max-width:500px; border-radius:14px; padding:20px; }
+        .editor-box h3 { margin:0 0 12px; color:#2c3e50; }
+        .editor-box textarea { width:100%; height:300px; border:1px solid #ddd; border-radius:8px; padding:10px;
+                               font-size:14px; box-sizing:border-box; resize:vertical; }
+        .editor-btns { margin-top:12px; display:flex; gap:10px; }
+        .editor-btns button { flex:1; padding:10px; border:none; border-radius:8px; font-size:15px; cursor:pointer; }
+        .btn-save { background:#1677ff; color:white; }
+        .btn-close { background:#eee; color:#333; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" src="https://t1.chatglm.cn/file/6af17eaaa22feefd6a5c7dc4.mp4?expired_at=1794643532&sign=f12a7f91bb1f46b0a95417d33c32011c&ext=mp4" loop preload="auto"></audio>
+
+    <div id="gate">
+        <div class="logo">📚</div>
+        <h2>临床营养学复习资料库</h2>
+        <button onclick="enterSite()">点击进入</button>
+        <p>内部学习平台 · 请勿外传</p>
+    </div>
+
+    <div class="header">
+        <h1>📚 临床营养学复习资料库</h1>
+        <p>📺 请先完整观看全部 4 个学习视频，才能解锁复习笔记</p>
+    </div>
+
+    <div class="progress" id="progressText">已完成 0 / 4</div>
+
+    <div class="grid">
+        <div class="icon-card" id="card0" onclick="openVideo(0)">
+            <div class="badge" id="badge0">🔒</div>
+            <div class="pdf-icon">🎬</div>
+            <div class="name">视频一：营养学基础</div>
+        </div>
+        <div class="icon-card" id="card1" onclick="openVideo(1)">
+            <div class="badge" id="badge1">🔒</div>
+            <div class="pdf-icon">🎬</div>
+            <div class="name">视频二：肠内外营养</div>
+        </div>
+        <div class="icon-card" id="card2" onclick="openVideo(2)">
+            <div class="badge" id="badge2">🔒</div>
+            <div class="pdf-icon">🎬</div>
+            <div class="name">视频三：疾病营养治疗</div>
+        </div>
+        <div class="icon-card" id="card3" onclick="openVideo(3)">
+            <div class="badge" id="badge3">🔒</div>
+            <div class="pdf-icon">🎬</div>
+            <div class="name">视频四：医院膳食</div>
+        </div>
+    </div>
+
+    <div class="notes-section">
+        <button class="notes-btn" id="notesBtn" onclick="openNotes()" disabled>🔒 完成全部视频后解锁复习笔记</button>
+        <div class="notes-content" id="notesContent">
+
+<div id="note0" class="note-block" style="display:none;">
+<h3>📄 营养学基础.pdf</h3>
+<pre>【七大营养素】蛋白质/脂类/碳水化合物（宏量）｜矿物质/维生素（微量）｜水/膳食纤维
+
+【DRIs五标准】EAR(50%人群)→RNI=EAR×1.2(97-98%)→AI比RNI大→UL(上限)→EER
+记忆：EAR防营养不良，RNI防慢性病
+
+【能量换算】1g碳水=4kcal｜1g脂肪=9kcal｜1g蛋白=4kcal｜1kcal=4.184kJ
+能量来源占比：碳水50-65%、脂肪20-30%、蛋白10-15%
+
+【BMR公式】男：66.47+13.75×体重+5.0×身高-6.76×年龄
+女：655.1+9.56×体重+1.85×身高-4.67×年龄
+基础代谢占总能量60-70%；体力活动15-30%
+
+【蛋白质】人体氮唯一来源；1g氮=6.25g蛋白质
+九大必需氨基酸：苏缬亮异亮，苯丙属芳香；还有色赖蛋，缺一即遭殃
+谷类第一限制氨基酸=赖氨酸；豆类=蛋氨酸
+氮平衡B=I-(U+F+S)；生物价BV=氮储留量/氮吸收量×100
+谷豆互补，荤素搭配=1+1>2
+
+【必需脂肪酸EFA】缺乏→湿疹、生长迟缓
+成人脂肪：SFA<10、MUFA10、PUFA10、n6:n3=(4~6):1、胆固醇<300mg
+
+【GI】<55低GI；55-75中；>75高。降低GI：选低GI、蛋白互补、少食多餐、粗做
+
+【水】新生儿80%→成人男60%女50-55%；每日水平衡2500ml
+轻度脱水2-4%、中度4-8%、重度8%以上（10%以上危及生命）
+
+【缺乏症速记】夜盲→VA｜佝偻病→VD钙磷｜脚气病→VB1｜坏血病→VC
+缺铁性贫血→铁｜甲状腺肿→碘｜克山病→硒｜癞皮病→烟酸(3D：皮炎腹泻痴呆)</pre>
+<button onclick="editNote(0)">✏️ 编辑此笔记</button>
+</div>
+
+<div id="note1" class="note-block" style="display:none;">
+<h3>📄 肠内肠外营养.pdf</h3>
+<pre>【核心原则】只要肠道有功能，就应首选肠内营养(EN)
+营养支持越早越好：一般伤后24~48h开始
+
+【EN适应证】膳食不足目标量60%、胃肠功能无严重损伤者
+【EN禁忌证】肠道完全性梗阻绝对禁止！<3个月婴儿禁用
+【EN并发症四大类】机械性、感染性、胃肠道、代谢性
+· 最常见并发症：腹泻(2-63%)→减慢输注速度，持续泵入优于分次
+· 最严重并发症：吸入性肺炎→床头抬高30-45°，营养液37~42°C
+· 配制液4°C冷藏，24h内使用完毕
+【EN制剂】非要素(整蛋白)→要素(短肽/氨基酸，消化吸收不良者)
+【管饲方式】连续性泵注16-24h：耐受性最好，危重病人首选
+
+【PN】不能经胃肠道吸收者的唯一营养途径
+PPN(周围静脉)不应超过2周；短期PN<5天是禁忌
+【PN并发症】置管、感染、代谢性
+· 肝脏脂肪变性：PN开始2周后，葡萄糖过量
+· 胆汁淤积：新生儿和儿童最常见(40~60%)
+· PN切忌突然换用无糖溶液
+【葡萄糖】外周<10%，>15%需中心静脉；总浓度≤23%
+【脂肪乳】占非蛋白能量30~50%，最好<50%；呼吸道受损病人首选
+【氨基酸】1~1.5g/(kg·d)；BCAA——唯一不被肝脏吸收
+谷氨酰胺：胃肠细胞主要能源，重症应早期补充
+
+【TNA全合一配制】先→葡萄糖、氨基酸；后→脂肪乳
+钙磷分别稀释、电解质不可直入脂肪乳、现配现用24h内输完
+
+【真题速记】重症胰腺炎首选EN｜EN最常见=腹泻｜最严重=吸入性肺炎</pre>
+<button onclick="editNote(1)">✏️ 编辑此笔记</button>
+</div>
+
+<div id="note2" class="note-block" style="display:none;">
+<h3>📄 各类疾病的营养治疗.pdf</h3>
+<pre>【营养缺乏病】过程：摄入不足→组织缺乏→生化→功能→形态学改变
+预防四条：食物多样化→食物强化→营养补充剂→原发病治疗
+
+【PEM】干瘦型Marasmus(<2岁、慢性、无水肿)｜水肿型Kwashiorkor(3-13岁、急性、有水肿)
+治疗：优质蛋白1.2-1.5g/kg、能量35-40kcal/kg；<1岁婴儿150kcal/kg
+单独过快补碳水→钠潴留、水肿、心衰
+
+【代谢综合征】四项符合三项确诊：BMI≥24｜血糖≥6.1/7.8｜血压≥140/90｜TG≥1.7/HDL低
+
+【肥胖】BMI≥28肥胖、≥24超重；男腰围≥90、女≥85腹型肥胖
+男体脂>25%、女>30%为肥胖；理想体重=身高-105
+CRD每日减500-1000kcal可长期；极低能400-800kcal不超12周
+餐次比3:4:3；碳水50-55%、蛋白15-20%、脂肪<25%
+
+【糖尿病】诊断：空腹≥7.0、餐后2h≥11.1；三多一少
+五驾马车：营养治疗(基础)+药物+运动+监测+教育
+能量三步法：理想体重=身高-105→体型判断→查表计算
+碳水45-60%、蛋白0.8-1.2g/kg(肾病<0.8)、钠<5g/d
+"五个一"：一牛奶一鸡蛋一瘦肉一鱼肉一豆腐
+
+【痛风】血尿酸≥420μmol/L诊断
+"三低一高"：低嘌呤、低能量、低脂低盐+高水(2000ml/d)
+急性期嘌呤<150mg；首选鸡蛋牛奶，忌酸奶；忌酒
+
+【骨质疏松】VD成人400IU、老人600IU、OP治疗800-1200IU
+钙：成人800mg、老人1000mg；Ca:P=1.5~2:1
+
+【高血压】限盐成人5g/d(轻3-5、中2-3、重无盐)；K:Na=1.5:1
+2022新指南：≥130/80mmHg；DASH饮食：高钾镁钙纤维、低饱和脂肪
+
+【冠心病】饱和脂肪酸<7%、胆固醇<300mg/d、脂肪20-25%、纤维20-30g/d
+LDL氧化→泡沫细胞→动脉粥样硬化；HDL有保护作用
+
+【IBD】首选EN；CD活动期EEN；PEN推荐>50%能量；不能诱导维持UC缓解
+UC：连续性结肠炎症｜CD：非连续性全层炎症
+
+【肝硬化】EN是能量补充最好方式；蛋白1.2-1.5g/kg
+肝性脑病前兆限蛋白(植物蛋白)；腹水钠1.5-2g/d、入水<1000ml
+
+【CKD】GFR<60三个月诊断；5期<15=尿毒症
+高热能30-35kcal/kg、热氮比250-300:1；鸡蛋首选、禁豆类、麦淀粉膳食
+限钠<2g、限钾1670mg、限磷高钙、进液量500ml+前日尿量</pre>
+<button onclick="editNote(2)">✏️ 编辑此笔记</button>
+</div>
+
+<div id="note3" class="note-block" style="display:none;">
+<h3>📄 膳食与医院膳食.pdf</h3>
+<pre>【医院膳食三大类】常规膳食｜治疗膳食｜诊断用试验膳食
+
+【常规膳食四类】普食→软食→半流质→流质
+· 流食食用不超过7天；流质只能短期1~2天使用
+· 术后：流质→半流食→软食→正常饮食
+
+【普食】2200-2600kcal；每日3餐(3:4:3)；蛋白70-90g、蔬菜≥300g
+【软食】2200-2400kcal；每日3-5餐；细软烂，忌粗纤维(芹菜青豆)
+【半流质】1500-1800kcal；每日5-6餐、主食≤300g
+餐次：早25%+加5%+午35%+加5%+晚30%；不能做半流质：煎鸡蛋
+【流质】800kcal(最多1600)；每餐200-250ml、每日6-7餐、间隔2-3h
+五类：浓流质/清流质/冷流质/不胀气流质/普通流质
+
+【治疗膳食】以平衡饮食为基础
+· 高蛋白：1.2-2.5g/kg·d，不超35%或3g/kg·d(蛋白质中毒)；增加钙
+· 低蛋白：肾轻度0.8-1.0、中重度0.4-0.8g/kg·d；麦淀粉代主食
+· 限脂三档：严格<10%(<20g)、中度<20%(<40g)、轻度<25%(<50g)
+· 低盐2000mg钠、无盐1000mg、低钠500mg以下；盐≤5g/d
+· 高纤维25-30g/d，不宜长期；低嘌呤<150mg/100g、饮水2000-3000ml
+
+【试验膳食】
+· 潜血试验3天：禁肉类和绿色蔬菜
+· 肌酐试验3天：低蛋白<40g/d、主食≤350g、忌茶咖啡
+· 碘试验2周：忌海产、不用加碘盐
+· 胆囊造影2天：第一天午餐高脂、晚无脂，服碘造影剂后禁食
+· 糖耐量：口服75g葡萄糖测30/60/120/180min
+· 氮平衡5-7天｜钙磷代谢5天｜钾钠代谢10天(诊断醛固酮增多症)</pre>
+<button onclick="editNote(3)">✏️ 编辑此笔记</button>
+</div>
+
+        </div>
+    </div>
+
+    <div class="video-mask" id="videoMask">
+        <video id="videoPlayer" src="" playsinline controls></video>
+        <div class="video-tip" id="videoTip">📺 观看中... 0%</div>
+    </div>
+
+    <div class="editor-mask" id="editorMask">
+        <div class="editor-box">
+            <h3 id="editorTitle">编辑笔记</h3>
+            <textarea id="editorArea"></textarea>
+            <div class="editor-btns">
+                <button class="btn-close" onclick="closeEditor()">关闭</button>
+                <button class="btn-save" onclick="saveContent()">💾 保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bgm = document.getElementById('bgm');
+        function enterSite() {
+            document.getElementById('gate').style.display = 'none';
+            bgm.play().catch(function(){});
+            document.addEventListener('touchstart', function(){ bgm.play().catch(function(){}); }, { once:true });
+        }
+
+        // ===== 四个视频直链 =====
+        // ⚠️ 视频二、三的顺序如果和内容对不上，把这两条链接交换位置即可
+        const videoUrls = [
+            // 视频一：蔡徐坤（已验证可用）
+            'https://t1.chatglm.cn/file/6af180aa20df45c1b3119d79.mp4?expired_at=1794644014&sign=7df64ebdecd7fb53894cf4f827b1acec&ext=mp4',
+            // 视频二：罗密欧与朱丽叶 或 维特鲁威蛙（测试看内容）
+            'https://cn-gddg-ct-01-11.bilivideo.com/upgcxcode/46/65/43057546546/43057546546-1-192.mp4?e=ig8euxZM2rNcNbRz7WdVhwdlhWhBhwdVhoNvNC8BqJIzNbfq9rVEuxTEnE8L5F6VnEsSTx0vkX8fqJeYTj_lta53NCM=&os=bcache&og=hw&deadline=1794222354&uipk=5&mid=0&nbs=1&platform=html5&oi=1782024106&trid=0000cb92bc9be0654dd5aea5b41f0bc0178h&gen=playurlv3&upsig=8e0712cedac640345a61c3f35f4875a9&uparams=e,os,og,deadline,uipk,mid,nbs,platform,oi,trid,gen&cdnid=61311&bvc=vod&nettype=0&bw=1091145&lrs=0&V=v3.1.1.0&agrr=1&buvid=&build=0&dl=0&f=h_0_0&orderid=0,1',
+            // 视频三：维特鲁威蛙 或 罗密欧与朱丽叶（测试看内容）
+            'https://cn-gddg-ct-01-12.bilivideo.com/upgcxcode/54/16/42932831654/42932831654-1-192.mp4?e=ig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfq9rVEuxTEnE8L5F6VnEsSTx0vkX8fqJeYTj_lta53NCM=&nbs=1&gen=playurlv3&og=hw&oi=1782024106&platform=html5&mid=0&deadline=1794222331&uipk=5&os=bcache&trid=0000483299d86b2f4c92b73fbad3b0f36f0h&upsig=ac6eff2b743a8079c05544ad2f3c37d7&uparams=e,nbs,gen,og,oi,platform,mid,deadline,uipk,os,trid&cdnid=61312&bvc=vod&nettype=0&bw=813193&lrs=0&V=v3.1.0.0&dl=0&f=h_0_0&agrr=1&buvid=&build=0&orderid=0,1',
+            // 视频四：电信诈骗原声 ✅
+            'https://upos-sz-estghw.bilivideo.com/upgcxcode/39/57/719795739/719795739-1-160.mp4?e=ig8euxZM2rNcNbRV7bdVhwdlhWdjhwdVhoNvNC8BqJIzNbfq9rVEuxTEnE8L5F6VnEsSTx0vkX8fqJeYTj_lta53NCM=&nbs=1&uipk=5&mid=0&deadline=1794222232&gen=playurlv3&og=hw&platform=html5&trid=0a5ec467c39b4425905cadc7fd2ce14h&oi=1782024106&os=estghw&upsig=933328f5bc0039ff5a71199c627e32f0&uparams=e,nbs,uipk,mid,deadline,gen,og,platform,trid,oi,os&bvc=vod&nettype=0&bw=854515&lrs=0&V=v3.1.0.0&dl=0&f=h_0_0&agrr=1&buvid=&build=0&orderid=0,1'
+        ];
+
+        const watched = JSON.parse(localStorage.getItem('watched') || '[false,false,false,false]');
+        const videoMask = document.getElementById('videoMask');
+        const player = document.getElementById('videoPlayer');
+        const tip = document.getElementById('videoTip');
+        let current = -1;
+        let ended = false;
+
+        function refreshUI() {
+            const count = watched.filter(Boolean).length;
+            document.getElementById('progressText').textContent = '已完成 ' + count + ' / 4';
+            for (let i = 0; i < 4; i++) {
+                document.getElementById('badge' + i).textContent = watched[i] ? '✅' : '🔒';
+                document.getElementById('card' + i).classList.toggle('done', watched[i]);
+            }
+            const btn = document.getElementById('notesBtn');
+            if (count === 4) {
+                btn.disabled = false;
+                btn.textContent = '📖 打开复习笔记';
+            }
+        }
+
+        function openVideo(i) {
+            if (watched[i]) { alert('✅ 这个视频已经看完啦！'); return; }
+            current = i;
+            ended = false;
+            bgm.volume = 0.15;
+            player.src = videoUrls[i];
+            videoMask.style.display = 'flex';
+            player.play().catch(function(){});
+        }
+
+        player.addEventListener('timeupdate', function() {
+            if (player.duration > 0) {
+                const pct = Math.floor(player.currentTime / player.duration * 100);
+                tip.textContent = '📺 观看中... ' + pct + '%';
+            }
+        });
+
+        player.addEventListener('seeking', function() {
+            if (!ended && player.currentTime > 1) {
+                player.currentTime = 0;
+                alert('⚠️ 不许快进！请完整观看 😏');
+            }
+        });
+
+        player.addEventListener('ended', function() {
+            ended = true;
+            watched[current] = true;
+            localStorage.setItem('watched', JSON.stringify(watched));
+            bgm.volume = 0.9;
+            refreshUI();
+            alert('🎉 恭喜！视频' + (current + 1) + '观看完成！');
+            videoMask.style.display = 'none';
+            player.src = '';
+        });
+
+        function openNotes() {
+            document.getElementById('notesContent').style.display = 'block';
+            for (let i = 0; i < 4; i++) {
+                document.getElementById('note' + i).style.display = 'block';
+            }
+        }
+
+        let editIndex = -1;
+        const editorMask = document.getElementById('editorMask');
+        const editorArea = document.getElementById('editorArea');
+        const editorTitle = document.getElementById('editorTitle');
+
+        function editNote(i) {
+            editIndex = i;
+            editorTitle.textContent = '✏️ 编辑笔记 ' + (i + 1);
+            editorArea.value = localStorage.getItem('note_' + i) ||
+                document.querySelector('#note' + i + ' pre').textContent;
+            editorMask.style.display = 'flex';
+        }
+        function closeEditor() { editorMask.style.display = 'none'; }
+        function saveContent() {
+            localStorage.setItem('note_' + editIndex, editorArea.value);
+            document.querySelector('#note' + editIndex + ' pre').textContent = editorArea.value;
+            editorMask.style.display = 'none';
+        }
+        editorMask.addEventListener('click', function(e){ if(e.target === editorMask) closeEditor(); });
+
+        refreshUI();
+    </script>
+</body>
+</html>
